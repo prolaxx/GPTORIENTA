@@ -1,0 +1,59 @@
+/* Estilos básicos del formulario */
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 1s; /* Animación de entrada */
+  }
+  
+  /* Estilo para los inputs y textarea */
+  .formContainer input,
+  .formContainer textarea {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  
+  /* Estilo cuando el campo está enfocado */
+  .formContainer input:focus,
+  .formContainer textarea:focus {
+    border-color: #6fb07f;
+    outline: none;
+  }
+  
+  /* Estilo del botón */
+  .formContainer button {
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #6fb07f;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  
+  /* Efecto hover en el botón */
+  .formContainer button:hover {
+    background-color: #5a9b6b;
+    transform: translateY(-2px);
+  }
+  
+  /* Efecto de clic en el botón */
+  .formContainer button:active {
+    transform: translateY(0);
+  }
+  
+  /* Ejemplo de animaciones adicionales usando animate.css */
+  .animatedButton {
+    animation: bounceIn 1s; /* Puedes usar cualquier clase de animate.css */
+  }
+  

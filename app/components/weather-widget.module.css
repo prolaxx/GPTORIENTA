@@ -1,0 +1,24 @@
+.weatherWidget {
+  display: none;
+}
+
+/* Otros estilos de weather-widget.module.css que no se están utilizando */
+.weatherBGCloudy {
+  background: linear-gradient(to top right, #b6c6c9, #8fa3ad);
+}
+
+.weatherBGSunny {
+  background: linear-gradient(to bottom left, #ffffd0, #007cf0);
+}
+
+.weatherBGRainy {
+  background: linear-gradient(to top, #647d8e, #a8c0c0);
+}
+
+.weatherWidgetData {
+  display: flex;
+  gap: 4px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
