@@ -1,0 +1,394 @@
+[1mdiff --git a/app/api/assistants/files/route.tsx b/app/api/assistants/files/route.tsx[m
+[1mindex af26c08..b80595e 100644[m
+[1m--- a/app/api/assistants/files/route.tsx[m
+[1m+++ b/app/api/assistants/files/route.tsx[m
+[36m@@ -1,55 +1,13 @@[m
+[31m-// app/api/files/[fileId]/route.ts[m
+[32m+[m[32mimport { NextResponse } from "next/server";[m
+[32m+[m[32mimport openai from "@/app/api/openai";[m
+[32m+[m[32mimport { assistantId } from "@/app/utils/assistant-config";[m
+[32m+[m[32mimport { getOrCreateVectorStore } from "@/app/utils/vectorStoreUtils";[m
+ [m
+[31m-import { assistantId } from '@/app/assistant-config';[m
+[31m-import { openai } from '@/app/openai';[m
+[31m-import { getOrCreateVectorStore } from '../../../utils/vectorStoreUtils';[m
+[31m-[m
+[31m-// Subir archivo al vector store del asistente[m
+[31m-export async function POST(request) {[m
+[31m-  try {[m
+[31m-    const formData = await request.formData();[m
+[31m-    const file = formData.get('file');[m
+[31m-    if (!file) {[m
+[31m-      return new Response('No se proporcionó un archivo', { status: 400 });[m
+[31m-    }[m
+[31m-[m
+[31m-    const vectorStoreId = await getOrCreateVectorStore();[m
+[31m-    if (!vectorStoreId) {[m
+[31m-      return new Response('Vector store no encontrado', { status: 404 });[m
+[31m-    }[m
+[31m-[m
+[31m-    // Subir el archivo usando el stream[m
+[31m-    let openaiFile;[m
+[31m-    try {[m
+[31m-      openaiFile = await openai.files.create({[m
+[31m-        file: file,[m
+[31m-        purpose: 'assistants',[m
+[31m-      });[m
+[31m-    } catch (error) {[m
+[31m-      return new Response(`Error al subir el archivo: ${error.message}`, {[m
+[31m-        status: 500,[m
+[31m-      });[m
+[31m-    }[m
+[31m-[m
+[31m-    // Agregar el archivo al vector store[m
+[31m-    await openai.beta.vectorStores.files.create(vectorStoreId, {[m
+[31m-      file_id: openaiFile.id,[m
+[31m-    });[m
+[31m-    return new Response();[m
+[31m-  } catch (error) {[m
+[31m-    console.error(error);[m
+[31m-    return new Response('Ocurrió un error al procesar la solicitud', {[m
+[31m-      status: 500,[m
+[31m-    });[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-// Listar archivos en el vector store del asistente[m
+ export async function GET() {[m
+   try {[m
+     const vectorStoreId = await getOrCreateVectorStore();[m
+     if (!vectorStoreId) {[m
+[31m-      return new Response('Vector store no encontrado', { status: 404 });[m
+[32m+[m[32m      return new NextResponse("Vector store no encontrado", { status: 404 });[m
+     }[m
+ [m
+     const fileList = await openai.beta.vectorStores.files.list(vectorStoreId);[m
+[36m@@ -68,35 +26,76 @@[m [mexport async function GET() {[m
+         };[m
+       })[m
+     );[m
+[31m-    return Response.json(filesArray);[m
+[32m+[m
+[32m+[m[32m    return NextResponse.json(filesArray);[m
+[32m+[m[32m  } catch (error) {[m
+[32m+[m[32m    console.error(error);[m
+[32m+[m[32m    return new NextResponse("Ocurrió un error al recuperar los archivos", {[m
+[32m+[m[32m      status: 500,[m
+[32m+[m[32m    });[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport async function POST(request: Request) {[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const formData = await request.formData();[m
+[32m+[m[32m    const blob = formData.get("file") as Blob;[m
+[32m+[m[32m    if (!blob) {[m
+[32m+[m[32m      return new NextResponse("No se proporcionó un archivo", { status: 400 });[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    // Convertir Blob a File[m
+[32m+[m[32m    const file = new File([blob], "uploaded_file", {[m
+[32m+[m[32m      type: blob.type,[m
+[32m+[m[32m      lastModified: Date.now(),[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    const vectorStoreId = await getOrCreateVectorStore();[m
+[32m+[m[32m    if (!vectorStoreId) {[m
+[32m+[m[32m      return new NextResponse("Vector store no encontrado", { status: 404 });[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    // Upload the file to OpenAI[m
+[32m+[m[32m    const openaiFile = await openai.files.create({[m
+[32m+[m[32m      file: file,[m
+[32m+[m[32m      purpose: "assistants",[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    // Add file to vector store[m
+[32m+[m[32m    await openai.beta.vectorStores.files.create(vectorStoreId, {[m
+[32m+[m[32m      file_id: openaiFile.id,[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    // Return the updated list of files[m
+[32m+[m[32m    return GET();[m
+   } catch (error) {[m
+     console.error(error);[m
+[31m-    return new Response('Ocurrió un error al recuperar los archivos', {[m
+[32m+[m[32m    return new NextResponse(`Error al subir el archivo: ${error.message}`, {[m
+       status: 500,[m
+     });[m
+   }[m
+ }[m
+ [m
+[31m-// Eliminar archivo del vector store del asistente[m
+[31m-export async function DELETE(request) {[m
+[32m+[m[32mexport async function DELETE(request: Request) {[m
+   try {[m
+[31m-    const body = await request.json();[m
+[31m-    const fileId = body.fileId;[m
+[32m+[m[32m    const { fileId } = await request.json();[m
+     if (!fileId) {[m
+[31m-      return new Response('No se proporcionó el ID del archivo', { status: 400 });[m
+[32m+[m[32m      return new NextResponse("No se proporcionó el ID del archivo", { status: 400 });[m
+     }[m
+ [m
+     const vectorStoreId = await getOrCreateVectorStore();[m
+     if (!vectorStoreId) {[m
+[31m-      return new Response('Vector store no encontrado', { status: 404 });[m
+[32m+[m[32m      return new NextResponse("Vector store no encontrado", { status: 404 });[m
+     }[m
+ [m
+[32m+[m[32m    // Delete file from vector store[m
+     await openai.beta.vectorStores.files.del(vectorStoreId, fileId);[m
+ [m
+[31m-    return new Response();[m
+[32m+[m[32m    // Return the updated list of files[m
+[32m+[m[32m    return GET();[m
+   } catch (error) {[m
+     console.error(error);[m
+[31m-    return new Response('Ocurrió un error al eliminar el archivo', {[m
+[32m+[m[32m    return new NextResponse(`Error al eliminar el archivo: ${error.message}`, {[m
+       status: 500,[m
+     });[m
+   }[m
+[1mdiff --git a/app/api/assistants/route.ts b/app/api/assistants/route.ts[m
+[1mindex ad1dce2..fa82e96 100644[m
+[1m--- a/app/api/assistants/route.ts[m
+[1m+++ b/app/api/assistants/route.ts[m
+[36m@@ -1,38 +1,43 @@[m
+[31m-import { openai } from "@/app/openai";[m
+[32m+[m[32mimport { NextResponse } from "next/server";[m
+[32m+[m[32mimport openai from "@/app/api/openai";[m
+ [m
+ export const runtime = "nodejs";[m
+ [m
+[31m-// Create a new assistant[m
+ export async function POST() {[m
+[31m-  const assistant = await openai.beta.assistants.create({[m
+[31m-    instructions: "You are a helpful assistant.",[m
+[31m-    name: "Quickstart Assistant",[m
+[31m-    model: "gpt-4o",[m
+[31m-    tools: [[m
+[31m-      { type: "code_interpreter" },[m
+[31m-      {[m
+[31m-        type: "function",[m
+[31m-        function: {[m
+[31m-          name: "get_weather",[m
+[31m-          description: "Determine weather in my location",[m
+[31m-          parameters: {[m
+[31m-            type: "object",[m
+[31m-            properties: {[m
+[31m-              location: {[m
+[31m-                type: "string",[m
+[31m-                description: "The city and state e.g. San Francisco, CA",[m
+[31m-              },[m
+[31m-              unit: {[m
+[31m-                type: "string",[m
+[31m-                enum: ["c", "f"],[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const assistant = await openai.beta.assistants.create({[m
+[32m+[m[32m      instructions: "You are a helpful assistant.",[m
+[32m+[m[32m      name: "Quickstart Assistant",[m
+[32m+[m[32m      model: "gpt-4o",[m
+[32m+[m[32m      tools: [[m
+[32m+[m[32m        { type: "code_interpreter" },[m
+[32m+[m[32m        {[m
+[32m+[m[32m          type: "function",[m
+[32m+[m[32m          function: {[m
+[32m+[m[32m            name: "get_weather",[m
+[32m+[m[32m            description: "Determine weather in my location",[m
+[32m+[m[32m            parameters: {[m
+[32m+[m[32m              type: "object",[m
+[32m+[m[32m              properties: {[m
+[32m+[m[32m                location: {[m
+[32m+[m[32m                  type: "string",[m
+[32m+[m[32m                  description: "The city and state e.g. San Francisco, CA",[m
+[32m+[m[32m                },[m
+[32m+[m[32m                unit: {[m
+[32m+[m[32m                  type: "string",[m
+[32m+[m[32m                  enum: ["c", "f"],[m
+[32m+[m[32m                },[m
+               },[m
+[32m+[m[32m              required: ["location"],[m
+             },[m
+[31m-            required: ["location"],[m
+           },[m
+         },[m
+[31m-      },[m
+[31m-      { type: "file_search" },[m
+[31m-    ],[m
+[31m-  });[m
+[31m-  return Response.json({ assistantId: assistant.id });[m
+[32m+[m[32m        { type: "file_search" },[m
+[32m+[m[32m      ],[m
+[32m+[m[32m    });[m
+[32m+[m[32m    return NextResponse.json({ assistantId: assistant.id });[m
+[32m+[m[32m  } catch (error) {[m
+[32m+[m[32m    console.error(error);[m
+[32m+[m[32m    return new NextResponse("Error al crear el asistente", { status: 500 });[m
+[32m+[m[32m  }[m
+ }[m
+[1mdiff --git a/app/api/assistants/threads/[threadId]/actions/route.ts b/app/api/assistants/threads/[threadId]/actions/route.ts[m
+[1mindex 8fd427d..7767f5b 100644[m
+[1m--- a/app/api/assistants/threads/[threadId]/actions/route.ts[m
+[1m+++ b/app/api/assistants/threads/[threadId]/actions/route.ts[m
+[36m@@ -1,15 +1,27 @@[m
+[31m-import { openai } from "@/app/openai";[m
+[32m+[m[32mimport { NextResponse } from "next/server";[m
+[32m+[m[32mimport openai from "@/app/api/openai";[m
+ [m
+[31m-// Send a new message to a thread[m
+[31m-export async function POST(request, { params: { threadId } }) {[m
+[31m-  const { toolCallOutputs, runId } = await request.json();[m
+[32m+[m[32mexport async function POST([m
+[32m+[m[32m  request: Request,[m
+[32m+[m[32m  { params }: { params: { threadId: string } }[m
+[32m+[m[32m) {[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const { threadId } = params;[m
+[32m+[m[32m    const { toolCallOutputs, runId } = await request.json();[m
+ [m
+[31m-  const stream = openai.beta.threads.runs.submitToolOutputsStream([m
+[31m-    threadId,[m
+[31m-    runId,[m
+[31m-    // { tool_outputs: [{ output: result, tool_call_id: toolCallId }] },[m
+[31m-    { tool_outputs: toolCallOutputs }[m
+[31m-  );[m
+[32m+[m[32m    const stream = await openai.beta.threads.runs.submitToolOutputsStream([m
+[32m+[m[32m      threadId,[m
+[32m+[m[32m      runId,[m
+[32m+[m[32m      { tool_outputs: toolCallOutputs }[m
+[32m+[m[32m    );[m
+ [m
+[31m-  return new Response(stream.toReadableStream());[m
+[32m+[m[32m    return new Response(stream.toReadableStream(), {[m
+[32m+[m[32m      headers: {[m
+[32m+[m[32m        "Content-Type": "text/event-stream",[m
+[32m+[m[32m      },[m
+[32m+[m[32m    });[m
+[32m+[m[32m  } catch (error) {[m
+[32m+[m[32m    console.error(error);[m
+[32m+[m[32m    return new NextResponse("Error al enviar las salidas de la herramienta", { status: 500 });[m
+[32m+[m[32m  }[m
+ }[m
+[1mdiff --git a/app/api/assistants/threads/[threadId]/messages/route.ts b/app/api/assistants/threads/[threadId]/messages/route.ts[m
+[1mindex fc6a0a2..2195893 100644[m
+[1m--- a/app/api/assistants/threads/[threadId]/messages/route.ts[m
+[1m+++ b/app/api/assistants/threads/[threadId]/messages/route.ts[m
+[36m@@ -1,20 +1,30 @@[m
+[31m-import { assistantId } from "@/app/assistant-config";[m
+[31m-import { openai } from "@/app/openai";[m
+[32m+[m[32m// Archivo route.tsx[m
+ [m
+[31m-export const runtime = "nodejs";[m
+[32m+[m[32mimport { NextResponse } from "next/server";[m
+[32m+[m[32mimport openai from "@/app/api/openai";[m
+[32m+[m[32mimport { assistantId } from "@/app/utils/assistant-config";[m
+ [m
+[31m-// Send a new message to a thread[m
+[31m-export async function POST(request, { params: { threadId } }) {[m
+[31m-  const { content } = await request.json();[m
+[32m+[m[32mexport async function POST(request: Request, { params }: { params: { threadId: string } }) {[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const { threadId } = params;[m
+[32m+[m[32m    const { content } = await request.json();[m
+ [m
+[31m-  await openai.beta.threads.messages.create(threadId, {[m
+[31m-    role: "user",[m
+[31m-    content: content,[m
+[31m-  });[m
+[32m+[m[32m    await openai.beta.threads.messages.create(threadId, {[m
+[32m+[m[32m      role: "user",[m
+[32m+[m[32m      content: content,[m
+[32m+[m[32m    });[m
+ [m
+[31m-  const stream = openai.beta.threads.runs.stream(threadId, {[m
+[31m-    assistant_id: assistantId,[m
+[31m-  });[m
+[32m+[m[32m    const stream = await openai.beta.threads.runs.stream(threadId, {[m
+[32m+[m[32m      assistant_id: assistantId,[m
+[32m+[m[32m    });[m
+ [m
+[31m-  return new Response(stream.toReadableStream());[m
+[31m-}[m
+[32m+[m[32m    return new Response(stream.toReadableStream(), {[m
+[32m+[m[32m      headers: {[m
+[32m+[m[32m        "Content-Type": "text/event-stream",[m
+[32m+[m[32m      },[m
+[32m+[m[32m    });[m
+[32m+[m[32m  } catch (error) {[m
+[32m+[m[32m    console.error(error);[m
+[32m+[m[32m    return new NextResponse("Error al enviar el mensaje", { status: 500 });[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/app/api/assistants/threads/route.ts b/app/api/assistants/threads/route.ts[m
+[1mindex a6f0685..0bfac5c 100644[m
+[1m--- a/app/api/assistants/threads/route.ts[m
+[1m+++ b/app/api/assistants/threads/route.ts[m
+[36m@@ -1,9 +1,14 @@[m
+[31m-import { openai } from "@/app/openai";[m
+[32m+[m[32mimport { NextResponse } from "next/server";[m
+[32m+[m[32mimport openai from "@/app/api/openai";[m
+ [m
+ export const runtime = "nodejs";[m
+ [m
+[31m-// Create a new thread[m
+ export async function POST() {[m
+[31m-  const thread = await openai.beta.threads.create();[m
+[31m-  return Response.json({ threadId: thread.id });[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const thread = await openai.beta.threads.create();[m
+[32m+[m[32m    return NextResponse.json({ threadId: thread.id });[m
+[32m+[m[32m  } catch (error) {[m
+[32m+[m[32m    console.error(error);[m
+[32m+[m[32m    return new NextResponse("Error al crear el hilo", { status: 500 });[m
+[32m+[m[32m  }[m
+ }[m
+[1mdiff --git a/app/api/files/[fileId]/route.ts b/app/api/files/[fileId]/route.ts[m
+[1mindex 15da632..cb7ee80 100644[m
+[1m--- a/app/api/files/[fileId]/route.ts[m
+[1m+++ b/app/api/files/[fileId]/route.ts[m
+[36m@@ -1,6 +1,6 @@[m
+ import { getOrCreateVectorStore } from '@utils/vectorStoreUtils';[m
+ import { NextResponse } from 'next/server';[m
+[31m-import { openai } from '@/app/openai';[m
+[32m+[m[32mimport openai from '@/app/api/openai';[m
+ [m
+ interface FileData {[m
+   file_id: string;[m
+[1mdiff --git a/app/api/saveresponse/route.ts b/app/api/saveresponse/route.ts[m
+[1mindex e399cca..01e5c86 100644[m
+[1m--- a/app/api/saveresponse/route.ts[m
+[1m+++ b/app/api/saveresponse/route.ts[m
+[36m@@ -3,25 +3,23 @@[m [mimport { NextRequest, NextResponse } from 'next/server';[m
+ // Simulación de base de datos (esto es solo un ejemplo)[m
+ interface FormData {[m
+   name: string;[m
+[31m-  email: string;[m
+[31m-  responses?: string;  // Ahora es opcional[m
+[31m-  favoriteClasses: string[];[m
+[32m+[m[32m  [key: string]: any; // Permite campos adicionales[m
+ }[m
+ [m
+ const database: FormData[] = [];[m
+ [m
+ export async function POST(req: NextRequest) {[m
+   try {[m
+[31m-    const { name, email, favoriteClasses } = await req.json();[m
+[32m+[m[32m    const formData = await req.json();[m
+ [m
+[31m-    console.log("Datos recibidos:", { name, email, favoriteClasses });[m
+[32m+[m[32m    console.log("Datos recibidos:", formData);[m
+ [m
+[31m-    if (!name || !email || !favoriteClasses) {[m
+[31m-      return NextResponse.json({ error: 'Todos los campos son obligatorios.' }, { status: 400 });[m
+[32m+[m[32m    if (!formData.name) {[m
+[32m+[m[32m      return NextResponse.json({ error: 'El campo nombre es obligatorio.' }, { status: 400 });[m
+     }[m
+ [m
+     // Guardar los datos en la base de datos o procesarlos como sea necesario[m
+[31m-    database.push({ name, email, favoriteClasses });[m
+[32m+[m[32m    database.push(formData);[m
+ [m
+     return NextResponse.json({ message: 'Respuestas guardadas correctamente.' });[m
+   } catch (error) {[m

@@ -1,0 +1,230 @@
+[33mcommit 06fc2d444a5d41b574082080f4c7b2e48156b84f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 7a392b0 d45b08f
+Author: Ilan Bigio <ilan@openai.com>
+Date:   Thu May 30 16:50:30 2024 -0400
+
+    Merge pull request #17 from aleksa-codes/upgrade-openai-model
+    
+    Upgrade to gpt-4o model
+
+[33mcommit d45b08ff78fcc6004c19f51912579ee4fbd2c3c2[m
+Author: aleksa-codes <stojsic.aleksa@gmail.com>
+Date:   Mon May 13 21:07:29 2024 +0200
+
+    Upgrade to gpt-4o model
+
+[33mcommit 7a392b0e48855971637fe13f770250c307ef59a7[m
+Merge: 30638cf de0366e
+Author: Romain Huet <romain.huet@gmail.com>
+Date:   Tue May 7 19:31:05 2024 +0200
+
+    Merge pull request #13 from jferrettiboke/patch-1
+    
+    fix(types): type `messagesEndRef` in `useRef`
+
+[33mcommit de0366e6d915513de0ace36d9ce18dff4cb7df06[m
+Merge: ea472dd 30638cf
+Author: Romain Huet <romain.huet@gmail.com>
+Date:   Tue May 7 19:30:37 2024 +0200
+
+    Merge branch 'main' into patch-1
+
+[33mcommit 30638cf20048be0a5229ce8a2d6bc94f2e87f986[m
+Merge: ce8e942 a9e9481
+Author: Romain Huet <romain.huet@gmail.com>
+Date:   Tue May 7 19:30:01 2024 +0200
+
+    Merge pull request #12 from KotaIkehara/fix/typo-in-chat
+    
+    Fix typo
+
+[33mcommit ea472dd81894832d193cb13178dc87234f63dcf7[m
+Author: Jesús Ferretti <jferrettiboke@users.noreply.github.com>
+Date:   Mon May 6 12:55:18 2024 +0200
+
+    fix(types): type `messagesEndRef` in `useRef`
+
+[33mcommit a9e948118662e1b6f00678160dd1cd104b873dbd[m
+Author: KotaIkehara <ikehara.aurora95@gmail.com>
+Date:   Sun May 5 11:27:37 2024 +0900
+
+    Fix typo
+
+[33mcommit ce8e942d31da515cdf0deda83b910c668acfcd87[m
+Merge: 1fa3266 2131970
+Author: Ilan Bigio <ilan@openai.com>
+Date:   Fri May 3 19:54:54 2024 -0400
+
+    Merge pull request #11 from akkadaska/feature/codeinterpreter-output-integration
+    
+    Integrate codeInterpreter output: fix file download link and display images in chat
+
+[33mcommit 2131970d06377568490efea89acec8b125188eb6[m
+Merge: fb8ce65 1fa3266
+Author: ibigio <ilanbigio@gmail.com>
+Date:   Fri May 3 19:47:37 2024 -0400
+
+    Merge branch 'main' into feature/codeinterpreter-output-integration
+
+[33mcommit fb8ce650dc814b8e36239702e105e434c22f7648[m
+Author: ibigio <ilanbigio@gmail.com>
+Date:   Fri May 3 19:47:27 2024 -0400
+
+    Tweak image styling.
+
+[33mcommit 1fa32661a7c8b9fe3381d527eb3888597a714f5f[m
+Merge: 33e714e 0830303
+Author: Ilan Bigio <ilan@openai.com>
+Date:   Fri May 3 19:24:18 2024 -0400
+
+    Merge pull request #4 from jaredpalmer/jp/make-it-deployable
+    
+    Make it deployable to Vercel
+
+[33mcommit 0830303837b2f3a1776517537fb90574fb703f97[m
+Merge: 18963d8 33e714e
+Author: Ilan Bigio <ilan@openai.com>
+Date:   Fri May 3 18:01:52 2024 -0400
+
+    Merge branch 'main' into jp/make-it-deployable
+
+[33mcommit 18963d824c7bc2b881a2822ecf771b60eaec7192[m
+Author: ibigio <ilanbigio@gmail.com>
+Date:   Fri May 3 18:00:34 2024 -0400
+
+    Make OPENAI_ASSISTANT_ID optional, and work with current setup flow.
+
+[33mcommit 33e714e01c84b9d5ef0e361fdb5d33bf02f9f5ba[m
+Merge: e5b843c 43f9342
+Author: Romain Huet <romain.huet@gmail.com>
+Date:   Fri May 3 23:05:53 2024 +0200
+
+    Merge pull request #10 from akkadaska/feature/replace-createAndStream-with-stream
+    
+    Remove deprecated createAndStream method, use stream instead
+
+[33mcommit c640d33c2b6242598fded1b6f2ff7975f28c96f4[m
+Author: akkadaska <akkadaska@gmail.com>
+Date:   Sat May 4 04:30:54 2024 +0900
+
+    Refactor: remove unused import
+
+[33mcommit 1718c24000a4be2869527161e2fc659aa259d730[m
+Author: akkadaska <akkadaska@gmail.com>
+Date:   Sat May 4 04:13:52 2024 +0900
+
+    Refactor: Remove unnecessary features and simplify code
+
+[33mcommit 7e23c9c0e7beae59ec518776aa3f2e73971e58f4[m
+Author: akkadaska <akkadaska@gmail.com>
+Date:   Sat May 4 03:43:32 2024 +0900
+
+    Add functionality to display images in chat interface
+
+[33mcommit b0fba4c47af9dec1b350471369f1fb6ea029cb5d[m
+Author: akkadaska <akkadaska@gmail.com>
+Date:   Sat May 4 03:17:15 2024 +0900
+
+    Fix CodeInterpreter file download link
+
+[33mcommit 43f9342b48542088c45e778a86e4f6e6d2dfa7a9[m
+Author: akkadaska <akkadaska@gmail.com>
+Date:   Fri May 3 22:46:49 2024 +0900
+
+    Remove deprecated createAndStream method, use stream instead
+
+[33mcommit e5b843cedc5972aefe4da1293f3fff83445dcf2e[m
+Merge: 06f2e03 c462428
+Author: Romain Huet <romain.huet@gmail.com>
+Date:   Thu May 2 20:55:45 2024 +0200
+
+    Merge pull request #5 from jaredpalmer/jp/fix-up-nextjs
+    
+    Fix small Next.js x TypeScript nits
+
+[33mcommit 06f2e03d9d811bd8b1588290a12bf43258805d67[m
+Merge: b37bf49 636b491
+Author: Romain Huet <romain.huet@gmail.com>
+Date:   Thu May 2 20:53:45 2024 +0200
+
+    Merge pull request #7 from eltociear/patch-1
+    
+    Update README
+
+[33mcommit 636b4913c404511ebcef22046964b1ccb38284aa[m
+Author: Ikko Eltociear Ashimine <eltociear@gmail.com>
+Date:   Thu May 2 18:39:41 2024 +0900
+
+    Update README.md
+    
+    minor fix
+
+[33mcommit c4624289ca6602583ea031ebd9769182c23e00a9[m
+Author: Jared Palmer <jared@jaredpalmer.com>
+Date:   Wed May 1 17:39:05 2024 -0700
+
+    Fix small Next.js x TypeScript nits
+
+[33mcommit b37bf49f710aa5374107bbf76f18c5ba9c219c7d[m
+Author: Romain Huet <romain.huet@gmail.com>
+Date:   Wed May 1 17:37:46 2024 -0700
+
+    Update README
+
+[33mcommit c6d1318ae1eaefe77209d31cc6294ce84683b519[m
+Merge: 821180d 07143e3
+Author: Jared Palmer <jared@jaredpalmer.com>
+Date:   Wed May 1 17:17:12 2024 -0700
+
+    Merge branch 'main' into jp/make-it-deployable
+
+[33mcommit 821180dfcf884a6d011c1375b5322bb78f554442[m
+Author: Jared Palmer <jared@jaredpalmer.com>
+Date:   Wed May 1 17:15:59 2024 -0700
+
+    Clean up readme
+
+[33mcommit 53f7a7eb2a71e3dbbb0dec9b78d5fa527c036dce[m
+Author: Jared Palmer <jared@jaredpalmer.com>
+Date:   Wed May 1 17:11:59 2024 -0700
+
+    Add Vercel deploy button
+
+[33mcommit 07143e3dfddbf4c78b5f032ef9c1446117333cc2[m
+Author: Ilan Bigio <ilan@openai.com>
+Date:   Wed May 1 20:04:21 2024 -0400
+
+    Update README.md - (correctly) update feedback form
+
+[33mcommit 4d1f81541be1996346b318eb0c00bb6f2463a945[m
+Author: Jared Palmer <jared@jaredpalmer.com>
+Date:   Wed May 1 17:02:51 2024 -0700
+
+    Make it deployable to Vercel
+
+[33mcommit 455365aed10df28758a66cc3cddd095992a14f58[m
+Author: Ilan Bigio <ilan@openai.com>
+Date:   Wed May 1 20:01:08 2024 -0400
+
+    Update README.md - update feedback form
+
+[33mcommit a3917bb231db121ad4435824751d0f7255208300[m
+Merge: 15cc623 8a4b3b0
+Author: Ilan Bigio <ilan@openai.com>
+Date:   Wed May 1 19:56:20 2024 -0400
+
+    Merge pull request #2 from Defimatt/main
+    
+    Update route.ts to fix BadRequestError
+
+[33mcommit 8a4b3b0ceadcdc96c2c6d8a60f762898109dae07[m
+Author: Matt <github@matt-duffin.com>
+Date:   Thu May 2 00:13:11 2024 +0100
+
+    Update route.ts to fix BadRequestError
+
+[33mcommit 15cc6234edea62517d7c0fd2137450a8ea21cc50[m
+Author: ibigio <ilanbigio@gmail.com>
+Date:   Wed May 1 17:36:43 2024 -0400
+
+    Initial commit

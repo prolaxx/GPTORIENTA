@@ -1,0 +1,29 @@
+{
+  "name": "assistants-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "animate.css": "^4.1.1",
+    "animejs": "^3.2.2",
+    "next": "^14.2.10",
+    "openai": "^4.68.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "@types/react": "^18.3.11",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "typescript": "^5.6.3"
+  },
+  "prettier": {
+    "singleQuote": false
+  }
+}
