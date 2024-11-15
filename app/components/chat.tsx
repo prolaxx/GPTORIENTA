@@ -49,11 +49,13 @@ type ChatProps = {
 const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState<MessageType[]>([]);
-  const [inputDisabled, setInputDisabled] = useState(false);
+  const [inputDisabled, setInputDisabled] = useState(true);
   const [threadId, setThreadId] = useState<string | null>(null);
+  const [orientationStarted, setOrientationStarted] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const assistantMessageRef = useRef<string>(""); // Ref para acumular los fragmentos
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -63,27 +65,19 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
     scrollToBottom();
   }, [messages]);
 
+  // Enfocar el campo de entrada cuando inputDisabled cambia a false
   useEffect(() => {
-    const createThread = async () => {
-      const res = await fetch(`/api/assistants/threads`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      setThreadId(data.threadId);
-    };
-    createThread();
-  }, []);
-
-  useEffect(() => {
-    if (initialMessage) {
-      sendMessage(initialMessage, false);
+    if (!inputDisabled && inputRef.current) {
+      inputRef.current.focus();
     }
-  }, [initialMessage]);
+  }, [inputDisabled]);
 
-  const sendMessage = async (text: string, displayUserMessage = true) => {
+  const sendMessage = async (text: string, displayUserMessage = true, overrideThreadId?: string) => {
+    const currentThreadId = overrideThreadId || threadId;
+
     if (!text.trim()) return;
-    if (!threadId) {
-      console.error("No se puede enviar el mensaje. threadId no es válido:", threadId);
+    if (!currentThreadId) {
+      console.error("No se puede enviar el mensaje. threadId no es válido:", currentThreadId);
       return;
     }
 
@@ -96,7 +90,7 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
 
     try {
       const response = await fetch(
-        `/api/assistants/threads/${threadId}/messages`,
+        `/api/assistants/threads/${currentThreadId}/messages`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -108,6 +102,10 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
         }
       );
 
+      if (!response.ok) {
+        throw new Error(`Error en el envío del mensaje: ${response.status}`);
+      }
+
       if (!response.body) {
         console.error("No se recibió respuesta del servidor.");
         setInputDisabled(false);
@@ -116,7 +114,7 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      assistantMessageRef.current = ""; // Reiniciar el acumulador para el nuevo mensaje
+      assistantMessageRef.current = "";
 
       let buffer = "";
 
@@ -126,10 +124,8 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
 
         buffer += decoder.decode(value, { stream: true });
 
-        // Dividir el buffer en líneas
         let lines = buffer.split(/\r?\n/);
 
-        // Mantener el último fragmento en el buffer si no termina con una nueva línea
         if (!buffer.endsWith("\n")) {
           buffer = lines.pop() || "";
         } else {
@@ -137,10 +133,8 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
         }
 
         for (let line of lines) {
-          // Eliminar espacios en blanco
           line = line.trim();
 
-          // Ignorar líneas vacías
           if (!line) continue;
 
           if (line.startsWith("data: ")) {
@@ -161,10 +155,8 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
               for (const part of contentParts) {
                 const content = part?.text?.value || "";
 
-                // Acumular fragmentos en assistantMessageRef
                 assistantMessageRef.current += content;
 
-                // Actualizar los mensajes a medida que se recibe cada fragmento
                 setMessages((prevMessages) => {
                   const lastMessage = prevMessages[prevMessages.length - 1];
                   if (lastMessage && lastMessage.role === "assistant") {
@@ -187,11 +179,8 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
             if (parsed.event === "thread.message.completed") {
               setInputDisabled(false);
             }
-
           } catch (error) {
             console.warn("No es un JSON válido, acumulando en buffer:", line);
-            // Aquí no ignoramos el chunk, ya que podría ser parte de un JSON incompleto
-            // Lo dejamos en el buffer para la siguiente iteración
             buffer = line;
           }
         }
@@ -212,12 +201,34 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
     setMessages((prevMessages) => [...prevMessages, { role, text }]);
   };
 
-  const handleStartOrientation = () => {
+  const handleStartOrientation = async () => {
     const formData = localStorage.getItem("formData");
-    if (formData) {
-      sendMessage(formData, false);
-    } else {
+    if (!formData) {
       console.error("No hay respuestas almacenadas localmente.");
+      return;
+    }
+
+    setOrientationStarted(true);
+
+    try {
+      const res = await fetch(`/api/assistants/threads`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        throw new Error(`Error en la creación del thread: ${res.status}`);
+      }
+      const data = await res.json();
+      if (!data.threadId) {
+        throw new Error("El threadId no se generó correctamente.");
+      }
+      console.log("Nuevo threadId creado:", data.threadId);
+      setThreadId(data.threadId);
+
+      // Enviar el mensaje inicial con el threadId recién creado
+      sendMessage(formData, false, data.threadId);
+    } catch (error) {
+      console.error("Error al crear el thread:", error);
+      setOrientationStarted(false); // Rehabilitar el botón si hay un error
     }
   };
 
@@ -237,12 +248,13 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
           onChange={(e) => setUserInput(e.target.value)}
           placeholder="Escribe tu mensaje"
           disabled={inputDisabled}
+          ref={inputRef}
         />
         <button type="submit" className={styles.button} disabled={inputDisabled}>
           Enviar
         </button>
       </form>
-      <button className={styles.startButton} onClick={handleStartOrientation}>
+      <button className={styles.startButton} onClick={handleStartOrientation} disabled={orientationStarted}>
         Iniciar Orientación
       </button>
     </div>
@@ -250,3 +262,4 @@ const Chat = ({ initialMessage, functionCallHandler }: ChatProps) => {
 };
 
 export default Chat;
+
